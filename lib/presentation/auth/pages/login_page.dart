@@ -20,7 +20,7 @@ class LoginPage extends StatelessWidget {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is LoginSuccess) {
-          successSnackBar(context,'Wellcom  ${state.email}');
+          successSnackBar(context,'Welcome  ${state.email}');
           Navigator.pushNamed(context, Routes.chatPage, arguments: state.email);
         } else if (state is AuthFailure) {
           errorSnackBar(context, state.message);

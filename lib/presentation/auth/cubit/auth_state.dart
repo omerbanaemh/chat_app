@@ -10,7 +10,10 @@ final class LoginSuccess extends AuthState {
   final String email;
   LoginSuccess(this.email);
 }
-final class RegisterSuccess extends AuthState {}
+final class RegisterSuccess extends AuthState {
+  final String email;
+  RegisterSuccess(this.email);
+}
 
 final class AuthFailure extends AuthState {
   final String message;

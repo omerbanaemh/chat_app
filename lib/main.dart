@@ -2,7 +2,7 @@ import 'package:chat_app/core/firebase_options.dart';
 import 'package:chat_app/data/services/auth_service.dart';
 import 'package:chat_app/presentation/auth/cubit/auth_cubit.dart';
 import 'package:chat_app/presentation/auth/pages/login_page.dart';
-import 'package:chat_app/presentation/auth/pages/resgister_page.dart';
+import 'package:chat_app/presentation/auth/pages/register_page.dart';
 import 'package:chat_app/presentation/chat/pages/chat_page.dart';
 import 'package:chat_app/utils/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -34,7 +34,7 @@ class ScholarChat extends StatelessWidget {
         debugShowCheckedModeBanner: false,
       routes: {
        Routes.loginPage: (context) => LoginPage(),
-       Routes.registerPage: (context) => const RegisterPage(),
+       Routes.registerPage: (context) => RegisterPage(),
        Routes.chatPage : (context) => ChatPage()
       },
       initialRoute: Routes.loginPage,

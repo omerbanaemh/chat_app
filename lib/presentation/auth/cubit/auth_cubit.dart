@@ -27,13 +27,19 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<void> register(String email, String password) async {
+  Future<void> register({required String email, required String password}) async {
     emit(AuthLoading());
     try {
       await authService.register(email: email, password: password);
-      emit(RegisterSuccess());
-    } catch (e) {
-      emit(AuthFailure("Register failed: ${e.toString()}"));
+      emit(RegisterSuccess(email));
+    }  on FirebaseAuthException catch (ex) {
+      if (ex.code == 'weak-password') {
+        emit(AuthFailure('weak password'));
+      } else if (ex.code == 'email-already-in-use') {
+        emit(AuthFailure('email already exists'));
+      }
+    } catch (ex) {
+      emit(AuthFailure('there was an error'));
     }
   }
 
