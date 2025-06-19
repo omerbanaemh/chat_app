@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:chat_app/constants.dart';
-import 'package:chat_app/models/message.dart';
-import 'package:chat_app/widgets/chat_buble.dart';
+import 'package:chat_app/core/constants.dart';
+import 'package:chat_app/data/models/message.dart';
+import 'package:chat_app/presentation/chat/widgets/chat_buble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatPage extends StatelessWidget {

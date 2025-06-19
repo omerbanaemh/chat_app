@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:chat_app/models/message.dart';
+import 'package:chat_app/data/models/message.dart';
 
-import '../constants.dart';
+import '../../../core/constants.dart';
 
 class ChatBuble extends StatelessWidget {
   const ChatBuble({

@@ -1,28 +1,25 @@
-import 'package:chat_app/helper/routes.dart';
+import 'package:chat_app/utils/routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-import 'package:chat_app/constants.dart';
-import 'package:chat_app/helper/show_snack_bar.dart';
-import 'package:chat_app/widgets/custom_button.dart';
-import 'package:chat_app/widgets/custom_text_field.dart';
+import 'package:chat_app/core/constants.dart';
+import 'package:chat_app/utils/show_snack_bar.dart';
+import 'package:chat_app/presentation/auth/widgets/custom_button.dart';
+import 'package:chat_app/presentation/auth/widgets/custom_text_field.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
-  String? email;
-
-  String? password;
-
+class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
 
   GlobalKey<FormState> formKey = GlobalKey();
 
+  String? email, password;
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
@@ -61,7 +58,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const Row(
                   children: [
                     Text(
-                      'REGISTER',
+                      'LOGIN',
                       style: TextStyle(
                         fontSize: 24,
                         color: Colors.white,
@@ -82,6 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 10,
                 ),
                 CustomFormTextField(
+                  obscureText: true,
                   onChanged: (data) {
                     password = data;
                   },
@@ -93,27 +91,26 @@ class _RegisterPageState extends State<RegisterPage> {
                 CustomButon(
                   onTap: () async {
                     if (formKey.currentState!.validate()) {
-                      isLoading = true;
-                      setState(() {});
+                      
+                      setState(() {isLoading = true;});
                       try {
-                        await registerUser();
-
-                        Navigator.pushNamed(context, Routes.chatPage);
+                        await loginUser();
+                        Navigator.pushNamed(context, Routes.chatPage,arguments: email);
                       } on FirebaseAuthException catch (ex) {
-                        if (ex.code == 'weak-password') {
-                          showSnackBar(context, 'weak password');
-                        } else if (ex.code == 'email-already-in-use') {
-                          showSnackBar(context, 'email already exists');
+                        if (ex.code == 'user-not-found') {
+                          showSnackBar(context, 'user not found');
+                        } else if (ex.code == 'wrong-password') {
+                          showSnackBar(context, 'wrong password');
                         }
                       } catch (ex) {
+                        print(ex);
                         showSnackBar(context, 'there was an error');
                       }
 
-                      isLoading = false;
-                      setState(() {});
+                      setState(() {  isLoading = false;});
                     } else {}
                   },
-                  text: 'REGISTER',
+                  text: 'LOGIN',
                 ),
                 const SizedBox(
                   height: 10,
@@ -122,17 +119,17 @@ class _RegisterPageState extends State<RegisterPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'already have an account?',
+                      'dont\'t have an account?',
                       style: TextStyle(
                         color: Colors.white,
                       ),
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        Navigator.pushNamed(context, Routes.registerPage);
                       },
                       child: const Text(
-                        '  Login',
+                        '  Register',
                         style: TextStyle(
                           color: Color(0xffC7EDE6),
                         ),
@@ -148,9 +145,9 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Future<void> registerUser() async {
+  Future<void> loginUser() async {
     UserCredential user = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email!, password: password!);
-        print(user);
+        .signInWithEmailAndPassword(email: email!, password: password!);
+    print(user);
   }
 }

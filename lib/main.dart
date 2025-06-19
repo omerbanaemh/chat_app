@@ -1,10 +1,10 @@
-import 'package:chat_app/firebase_options.dart';
-import 'package:chat_app/helper/routes.dart';
+import 'package:chat_app/core/firebase_options.dart';
+import 'package:chat_app/utils/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:chat_app/pages/chat_page.dart';
-import 'package:chat_app/pages/login_page.dart';
-import 'package:chat_app/pages/resgister_page.dart';
+import 'package:chat_app/presentation/chat/pages/chat_page.dart';
+import 'package:chat_app/presentation/auth/pages/login_page.dart';
+import 'package:chat_app/presentation/auth/pages/resgister_page.dart';
 
 
 void main() async  {
