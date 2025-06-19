@@ -16,9 +16,8 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  String? email;
-
-  String? password;
+final TextEditingController emailController = TextEditingController();
+final TextEditingController passwordController = TextEditingController();
 
   bool isLoading = false;
 
@@ -74,18 +73,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 20,
                 ),
                 CustomFormTextField(
-                  onChanged: (data) {
-                    email = data;
-                  },
+                  controlle: emailController,
+             
                   hintText: 'Email',
                 ),
                 const SizedBox(
                   height: 10,
                 ),
                 CustomFormTextField(
-                  onChanged: (data) {
-                    password = data;
-                  },
+                  controlle: passwordController,
+           
                   hintText: 'Password',
                 ),
                 const SizedBox(
@@ -102,12 +99,12 @@ class _RegisterPageState extends State<RegisterPage> {
                         Navigator.pushNamed(context, Routes.chatPage);
                       } on FirebaseAuthException catch (ex) {
                         if (ex.code == 'weak-password') {
-                          showSnackBar(context, 'weak password');
+                          errorSnackBar(context, 'weak password');
                         } else if (ex.code == 'email-already-in-use') {
-                          showSnackBar(context, 'email already exists');
+                          errorSnackBar(context, 'email already exists');
                         }
                       } catch (ex) {
-                        showSnackBar(context, 'there was an error');
+                        errorSnackBar(context, 'there was an error');
                       }
 
                       isLoading = false;
@@ -151,7 +148,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> registerUser() async {
     UserCredential user = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email!, password: password!);
+        .createUserWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim());
         print(user);
   }
 }
