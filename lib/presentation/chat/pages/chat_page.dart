@@ -1,5 +1,4 @@
 import 'package:chat_app/core/constants.dart';
-import 'package:chat_app/data/models/message.dart';
 import 'package:chat_app/presentation/chat/cubit/chat_cubit.dart';
 import 'package:chat_app/presentation/chat/widgets/chat_buble.dart';
 import 'package:chat_app/presentation/chat/widgets/message_Input_field.dart';
@@ -7,15 +6,28 @@ import 'package:chat_app/utils/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
+  const ChatPage({super.key});
+
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
   final _controller = ScrollController();
   TextEditingController controller = TextEditingController();
+  String? email;
 
-  ChatPage({super.key});
+  @override
+  void dispose() {
+    _controller.dispose();
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Message> messagesList = [];
-    String email = ModalRoute.of(context)!.settings.arguments.toString();
+    email = ModalRoute.of(context)!.settings.arguments.toString();
     BlocProvider.of<ChatCubit>(context).getMessages();
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +40,7 @@ class ChatPage extends StatelessWidget {
               kLogo,
               height: 50,
             ),
-            Text('chat'),
+            const Text('chat'),
           ],
         ),
         centerTitle: true,
@@ -37,39 +49,50 @@ class ChatPage extends StatelessWidget {
         children: [
           Expanded(
             child: BlocConsumer<ChatCubit, ChatState>(
+              buildWhen: (previous, current) {
+                return current is ChatSuccess || current is ChatLoading;
+              },
               listener: (context, state) {
-                if (state is ChatSuccess) {
-                  messagesList = state.messagesList;
-                } else if (state is ChatFailure) {
+                if (state is ChatFailure) {
                   errorSnackBar(context, state.message);
                 }
               },
               builder: (context, state) {
-                return state is ChatSuccess ? ListView.builder(
-                  reverse: true,
-                  controller: _controller,
-                  itemCount: messagesList.length,
-                  itemBuilder: (context, index) {
-                    return messagesList[index].id == email
-                        ? ChatBuble(
-                            message: messagesList[index],
+                return state is ChatSuccess
+                    ? ListView.builder(
+                        reverse: true,
+                        controller: _controller,
+                        itemCount: state.messagesList.length,
+                        itemBuilder: (context, index) {
+                          return state.messagesList[index].id == email
+                              ? ChatBuble(
+                                  message: state.messagesList[index],
+                                )
+                              : ChatBubleForFriend(
+                                  message: state.messagesList[index]);
+                        },
+                      )
+                    : state is ChatLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(),
                           )
-                        : ChatBubleForFriend(message: messagesList[index]);
-                  },
-                ) : state is ChatLoading ?
-                    Center(child: CircularProgressIndicator(),):
-                    Center(child: Text('no messages'),);
+                        : const Center(
+                            child: Text('no messages'),
+                          );
               },
             ),
           ),
-          MessageInputField(controller: controller, onSend: (){
-            BlocProvider.of<ChatCubit>(context).sendMessage(text: controller.text, email: email);
+          MessageInputField(
+              controller: controller,
+              onSend: () {
+                BlocProvider.of<ChatCubit>(context)
+                    .sendMessage(text: controller.text, email: email??'');
 
-            controller.clear();
-            _controller.animateTo(0,
-                duration: Duration(milliseconds: 500),
-                curve: Curves.easeIn);
-          }),
+                controller.clear();
+                _controller.animateTo(0,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeIn);
+              }),
         ],
       ),
     );
