@@ -1,7 +1,9 @@
 import 'package:chat_app/core/constants.dart';
+import 'package:chat_app/presentation/auth/cubit/auth_cubit.dart';
 import 'package:chat_app/presentation/chat/cubit/chat_cubit.dart';
 import 'package:chat_app/presentation/chat/widgets/chat_buble.dart';
-import 'package:chat_app/presentation/chat/widgets/message_Input_field.dart';
+import 'package:chat_app/presentation/chat/widgets/message_input_field.dart';
+import 'package:chat_app/utils/routes.dart';
 import 'package:chat_app/utils/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,6 +33,23 @@ class _ChatPageState extends State<ChatPage> {
     BlocProvider.of<ChatCubit>(context).getMessages();
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          BlocListener<AuthCubit, AuthState>(
+            listener: (context, state) {
+              if (state is AuthLoggedOut) {
+                Navigator.of(context).pushReplacementNamed(Routes.loginPage);
+              }
+            },
+            child: IconButton(
+                onPressed: () {
+                  context.read<AuthCubit>().logout();
+                },
+                icon: const Icon(
+                  Icons.logout,
+                  color: Colors.white,
+                )),
+          )
+        ],
         automaticallyImplyLeading: false,
         backgroundColor: kPrimaryColor,
         title: Row(
@@ -86,7 +105,7 @@ class _ChatPageState extends State<ChatPage> {
               controller: controller,
               onSend: () {
                 BlocProvider.of<ChatCubit>(context)
-                    .sendMessage(text: controller.text, email: email??'');
+                    .sendMessage(text: controller.text, email: email ?? '');
 
                 controller.clear();
                 _controller.animateTo(0,
